@@ -134,7 +134,7 @@ export default function Admin() {
               </svg>
               Item Management
             </h2>
-            <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200"
+            <button className="px-4 py-2 bg-gradient-to-r from-green-400 to-green-700 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200"
               onClick={() => (document.getElementById("addModal") as HTMLDialogElement).showModal()}>
               + Add Item
             </button>
