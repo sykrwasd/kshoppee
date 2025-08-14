@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 type Item = {
   _id: string;
@@ -8,20 +9,59 @@ type Item = {
 
 export default function Admin() {
   const [items, setItems] = useState<Item[]>([]);
+  const [name,setName] = useState("");
+  const [price, setPrice] = useState("")
 
+
+  
   useEffect(() => {
-    async function fetchItems() {
-      try {
-        const res = await fetch("/api/item");
-        const data = await res.json();
-        setItems(data);
-      } catch (e) {
-        console.error("Error fetching items:", e);
-      }
-    }
-
     fetchItems();
   }, []);
+  
+  async function fetchItems() {
+    try {
+      const res = await fetch("/api/getitem");
+      const data = await res.json();
+      setItems(data);
+    } catch (e) {
+      console.error("Error fetching items:", e);
+    }
+  }
+
+  const handleAddItem = async () => {
+
+    try{
+      
+      const response = await fetch("/api/additem", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          price
+        }),
+      });
+
+      const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.error || "Failed to add item");
+      return;
+    }
+
+    Swal.fire({
+  title: "Item Added Successfully!",
+  icon: "success"
+});
+    setName("");
+    setPrice("");
+
+    // 🔄 Refresh list from server
+    fetchItems();
+
+    } catch (e){
+      console.error(e)
+    }
+  }
 
  
 
@@ -194,6 +234,7 @@ export default function Admin() {
         type="text"
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
         placeholder="Item Name"
+         onChange={(e) => setName(e.target.value)}
       />
 
       <label className="mt-6 block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
@@ -203,6 +244,7 @@ export default function Admin() {
         type="text"
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
         placeholder="Item Price"
+       onChange={(e) => setPrice(e.target.value)}
       />
       
 
@@ -210,7 +252,10 @@ export default function Admin() {
 
     <div className="modal-action">
       <form method="dialog" className="flex gap-3">
-        <button className="btn btn-primary rounded-lg">Save</button>
+        <button 
+        className="btn btn-primary rounded-lg"
+        onClick={handleAddItem}
+        >Save</button>
         <button className="btn rounded-lg">Close</button>
       </form>
     </div>

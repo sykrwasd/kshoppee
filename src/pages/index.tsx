@@ -487,8 +487,8 @@ export default function ClosingReport() {
         </table>
 
         <p style={{ textAlign: "center", fontSize: "14px", color: "#555" }}>
-          Generated on {new Date().toLocaleDateString()} at{" "}
-          {new Date().toLocaleTimeString()}
+          Generated on {new Date().toISOString().split("T")[0]}
+          {new Date().toISOString().split("T")[0]}
         </p>
       </div>
 

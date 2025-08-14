@@ -6,6 +6,5 @@ const itemSchema = new mongoose.Schema({
 
 });
 
-module.exports = mongoose.model('item', itemSchema);
-
+export default mongoose.models.item || mongoose.model("item", itemSchema);
 
