@@ -11,6 +11,7 @@ export default function Admin() {
   const [items, setItems] = useState<Item[]>([]);
   const [name,setName] = useState("");
   const [price, setPrice] = useState("")
+  const [editId, setEditId] = useState<string>("");
 
 
   
@@ -62,6 +63,41 @@ export default function Admin() {
       console.error(e)
     }
   }
+
+  const handleDeleteItem = async (id:any) => {
+    if (!confirm("Delete this item?")) return;
+    try {
+      const res = await fetch(`/api/deleteitem?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || "Failed to delete");
+
+      fetchItems();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUpdateItem = async (id : any) => {
+    if (!name || !price) return alert("Name and price are required");
+
+    try {
+      const res = await fetch(`/api/updateitem?id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, price }),
+      });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || "Failed to update");
+
+      setEditId("");
+      setName("");
+      setPrice("");
+      fetchItems();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
 
  
 
@@ -150,7 +186,17 @@ export default function Admin() {
                           </span>
                         </td>
                         <td className="py-4 px-4 flex gap-2">
-                          <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-['Inter',sans-serif]">
+                          <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-['Inter',sans-serif]"
+                          onClick={() => {
+                      setEditId(item._id);
+                      setName(item.itemName);
+                      setPrice(item.itemPrice.toString());
+                      (
+                        document.getElementById(
+                          "editModal"
+                        ) as HTMLDialogElement
+                      ).showModal();
+                    }}>
                             <svg
                               className="w-4 h-4 mr-2"
                               fill="none"
@@ -168,6 +214,7 @@ export default function Admin() {
                           </button>
                           <button
                             className="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-['Inter',sans-serif]"
+                            onClick={() => handleDeleteItem(item._id)}
                           >
                             <svg
                               className="w-4 h-4 mr-2"
@@ -261,6 +308,37 @@ export default function Admin() {
     </div>
   </div>
 </dialog>
+
+ <dialog id="editModal" className="modal">
+        <div className="modal-box bg-white">
+          <h3 className="font-bold text-lg text-black">Edit Item</h3>
+          <input
+            type="text"
+            placeholder="Item Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+          />
+          <input
+            type="text"
+            placeholder="Item Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+             className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+          />
+          <div className="modal-action">
+            <form method="dialog">
+              <button
+                onClick={() => handleUpdateItem(editId)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+              >
+                Update
+              </button>
+              <button className="btn ml-2 px-4 py-2 rounded-lg border">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
 
 
     </div>

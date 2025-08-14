@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const items = await Items.find({});
+      const items = await Items.find().sort({itemName : 1});
       res.status(200).json(items); // Send the data back to the client
       console.log(items)
     } catch (err) {
