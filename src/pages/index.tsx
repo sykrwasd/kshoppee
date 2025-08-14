@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 
 export default function ClosingReport() {
@@ -171,7 +171,8 @@ export default function ClosingReport() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                   <p className="text-xl font-bold font-['Poppins',sans-serif] mb-2">No items added yet</p>
-                  <p className="text-base font-medium font-['Inter',sans-serif]">Click "Add Item" to start building your report</p>
+                  <p className="text-base font-medium font-['Inter',sans-serif]">Click &quot;Add Item&quot;
+                  to start building your report</p>
                 </div>
               )}
             </div>
