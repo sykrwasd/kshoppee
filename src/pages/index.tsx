@@ -491,6 +491,8 @@ export default function ClosingReport() {
           {new Date().toLocaleTimeString()}
         </p>
       </div>
+
+     
     </div>
   );
 }

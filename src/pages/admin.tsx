@@ -58,7 +58,8 @@ export default function Admin() {
               </svg>
               Item Management
             </h2>
-            <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200">
+            <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200"
+              onClick={() => (document.getElementById("addModal") as HTMLDialogElement).showModal()}>
               + Add Item
             </button>
           </div>
@@ -179,6 +180,46 @@ export default function Admin() {
           </div>
         </div>
       </div>
+
+       <dialog id="addModal" className="modal">
+  <div className="modal-box bg-white">
+    <h3 className="font-bold text-lg text-black">Add Item</h3>
+
+    {/* Form Content */}
+    <div className="mt-4">
+      <label className="block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
+        Item Name
+      </label>
+      <input
+        type="text"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+        placeholder="Item Name"
+      />
+
+      <label className="mt-6 block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
+        Item Price
+      </label>
+      <input
+        type="text"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+        placeholder="Item Price"
+      />
+      
+
     </div>
+
+    <div className="modal-action">
+      <form method="dialog" className="flex gap-3">
+        <button className="btn btn-primary rounded-lg">Save</button>
+        <button className="btn rounded-lg">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+
+    </div>
+
+    
   );
 }
