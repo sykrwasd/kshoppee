@@ -1,5 +1,6 @@
 import { use, useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 
 type Item = {
   _id: string;
@@ -8,17 +9,20 @@ type Item = {
 };
 
 export default function Admin() {
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
-  const [name,setName] = useState("");
-  const [price, setPrice] = useState("")
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
   const [editId, setEditId] = useState<string>("");
+  const [password, setPassword] = useState("");
 
-
-  
   useEffect(() => {
     fetchItems();
+    (
+      document.getElementById("passwordModal") as HTMLDialogElement
+    )?.showModal();
   }, []);
-  
+
   async function fetchItems() {
     try {
       const res = await fetch("/api/getitem");
@@ -30,41 +34,37 @@ export default function Admin() {
   }
 
   const handleAddItem = async () => {
-
-    try{
-      
+    try {
       const response = await fetch("/api/additem", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          price
+          price,
         }),
       });
 
       const data = await response.json();
 
-    if (!response.ok) {
-      alert(data.error || "Failed to add item");
-      return;
+      if (!response.ok) {
+        alert(data.error || "Failed to add item");
+        return;
+      }
+
+      Swal.fire({
+        title: "Item Added Successfully!",
+        icon: "success",
+      });
+      setName("");
+      setPrice("");
+
+      fetchItems();
+    } catch (e) {
+      console.error(e);
     }
+  };
 
-    Swal.fire({
-  title: "Item Added Successfully!",
-  icon: "success"
-});
-    setName("");
-    setPrice("");
-
-    // 🔄 Refresh list from server
-    fetchItems();
-
-    } catch (e){
-      console.error(e)
-    }
-  }
-
-  const handleDeleteItem = async (id:any) => {
+  const handleDeleteItem = async (id: any) => {
     if (!confirm("Delete this item?")) return;
     try {
       const res = await fetch(`/api/deleteitem?id=${id}`, { method: "DELETE" });
@@ -77,7 +77,7 @@ export default function Admin() {
     }
   };
 
-  const handleUpdateItem = async (id : any) => {
+  const handleUpdateItem = async (id: any) => {
     if (!name || !price) return alert("Name and price are required");
 
     try {
@@ -98,8 +98,41 @@ export default function Admin() {
     }
   };
 
+  const handlePassword = async () => {
+    try {
+      const res = await fetch(`/api/checkpassword`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
 
- 
+      if (!res.ok) {
+        (
+          document.getElementById("passwordModal") as HTMLDialogElement
+        )?.close();
+
+        Swal.fire({
+          title: "Wrong Password, Redirecting..",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 500);
+      } else {
+        (
+          document.getElementById("passwordModal") as HTMLDialogElement
+        )?.close();
+        Swal.fire({
+          title: "Admin Verified",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6 font-['Inter',system-ui,sans-serif]">
@@ -134,8 +167,14 @@ export default function Admin() {
               </svg>
               Item Management
             </h2>
-            <button className="px-4 py-2 bg-gradient-to-r from-green-400 to-green-700 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200"
-              onClick={() => (document.getElementById("addModal") as HTMLDialogElement).showModal()}>
+            <button
+              className="px-4 py-2 bg-gradient-to-r from-green-400 to-green-700 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-200"
+              onClick={() =>
+                (
+                  document.getElementById("addModal") as HTMLDialogElement
+                ).showModal()
+              }
+            >
               + Add Item
             </button>
           </div>
@@ -186,17 +225,19 @@ export default function Admin() {
                           </span>
                         </td>
                         <td className="py-4 px-4 flex gap-2">
-                          <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-['Inter',sans-serif]"
-                          onClick={() => {
-                      setEditId(item._id);
-                      setName(item.itemName);
-                      setPrice(item.itemPrice.toString());
-                      (
-                        document.getElementById(
-                          "editModal"
-                        ) as HTMLDialogElement
-                      ).showModal();
-                    }}>
+                          <button
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-['Inter',sans-serif]"
+                            onClick={() => {
+                              setEditId(item._id);
+                              setName(item.itemName);
+                              setPrice(item.itemPrice.toString());
+                              (
+                                document.getElementById(
+                                  "editModal"
+                                ) as HTMLDialogElement
+                              ).showModal();
+                            }}
+                          >
                             <svg
                               className="w-4 h-4 mr-2"
                               fill="none"
@@ -268,48 +309,48 @@ export default function Admin() {
         </div>
       </div>
 
-       <dialog id="addModal" className="modal">
-  <div className="modal-box bg-white">
-    <h3 className="font-bold text-lg text-black">Add Item</h3>
+      <dialog id="addModal" className="modal">
+        <div className="modal-box bg-white">
+          <h3 className="font-bold text-lg text-black">Add Item</h3>
 
-    {/* Form Content */}
-    <div className="mt-4">
-      <label className="block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
-        Item Name
-      </label>
-      <input
-        type="text"
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
-        placeholder="Item Name"
-         onChange={(e) => setName(e.target.value)}
-      />
+          {/* Form Content */}
+          <div className="mt-4">
+            <label className="block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
+              Item Name
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+              placeholder="Item Name"
+              onChange={(e) => setName(e.target.value)}
+            />
 
-      <label className="mt-6 block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
-        Item Price
-      </label>
-      <input
-        type="text"
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
-        placeholder="Item Price"
-       onChange={(e) => setPrice(e.target.value)}
-      />
-      
+            <label className="mt-6 block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
+              Item Price
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+              placeholder="Item Price"
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
 
-    </div>
+          <div className="modal-action">
+            <form method="dialog" className="flex gap-3">
+              <button
+                className="btn btn-primary rounded-lg"
+                onClick={handleAddItem}
+              >
+                Save
+              </button>
+              <button className="btn rounded-lg">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
 
-    <div className="modal-action">
-      <form method="dialog" className="flex gap-3">
-        <button 
-        className="btn btn-primary rounded-lg"
-        onClick={handleAddItem}
-        >Save</button>
-        <button className="btn rounded-lg">Close</button>
-      </form>
-    </div>
-  </div>
-</dialog>
-
- <dialog id="editModal" className="modal">
+      <dialog id="editModal" className="modal">
         <div className="modal-box bg-white">
           <h3 className="font-bold text-lg text-black">Edit Item</h3>
           <input
@@ -324,7 +365,7 @@ export default function Admin() {
             placeholder="Item Price"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-             className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+            className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
           />
           <div className="modal-action">
             <form method="dialog">
@@ -334,15 +375,44 @@ export default function Admin() {
               >
                 Update
               </button>
-              <button className="btn ml-2 px-4 py-2 rounded-lg border">Close</button>
+              <button className="btn ml-2 px-4 py-2 rounded-lg border">
+                Close
+              </button>
             </form>
           </div>
         </div>
       </dialog>
 
+      <dialog id="passwordModal" className="modal backdrop-blur-sm">
+        <div className="modal-box bg-white ">
+          <h3 className="font-bold text-lg text-black">
+            Password are required to proceed.
+          </h3>
 
+          {/* Form Content */}
+          <div className="mt-4">
+            <label className="block text-sm font-bold text-gray-700 font-['Poppins',sans-serif] uppercase tracking-wide mb-2">
+              Password
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
+              placeholder="Enter Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <div className="modal-action flex gap-3">
+              <button
+                type="button"
+                className="btn btn-primary rounded-lg"
+                onClick={handlePassword}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </dialog>
     </div>
-
-    
   );
 }
