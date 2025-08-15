@@ -20,7 +20,7 @@ export default function ClosingReport() {
   useEffect(() => {
     async function getItems() {
       try {
-        const res = await fetch("/api/item");
+        const res = await fetch("/api/getitem");
         const data = await res.json();
         setItems(data);
       } catch (e) {
