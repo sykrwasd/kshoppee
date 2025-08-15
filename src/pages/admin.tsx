@@ -395,7 +395,7 @@ export default function Admin() {
               Password
             </label>
             <input
-              type="text"
+              type="password"
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm font-['Inter',sans-serif] text-gray-800 placeholder-gray-500"
               placeholder="Enter Password"
               onChange={(e) => setPassword(e.target.value)}
