@@ -51,6 +51,7 @@ export default function Admin() {
         return;
       }
 
+      setItems(prev => [...prev, data.item]); 
       Swal.fire({
         title: "Item Added Successfully!",
         icon: "success",
@@ -58,7 +59,6 @@ export default function Admin() {
       setName("");
       setPrice("");
 
-      fetchItems();
     } catch (e) {
       console.error(e);
     }
